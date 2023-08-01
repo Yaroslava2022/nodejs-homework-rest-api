@@ -1,11 +1,12 @@
-import {HttpError} from "../helpers/index.js";
-import User from "../models/user.js";
+
 import bcrypt from "bcryptjs";
 import "dotenv/config";
 import jwt from "jsonwebtoken";
+import {HttpError} from "../helpers/index.js";
+import User from "../models/user.js";
 import { ctrlWrapper } from "../decorators/index.js";
 
-const {JWT_SECRET}= process.env;
+const { JWT_SECRET }= process.env;
 
 const signup = async(req, res) => {
     const { email, password } = req.body;
@@ -15,10 +16,10 @@ const signup = async(req, res) => {
 		throw HttpError(409, "Email in use");
 	};
     const hashPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ ...req.body, password: hashPassword });
+    const newUser = await User.create({ ...req.body, password: hashPassword});
 
     res.status(201).json({
-        // password: newUser.password,
+        
 		email: newUser.email,
         subscription: newUser.subscription,
     })
@@ -41,13 +42,31 @@ const signin = async(req, res) => {
 		id: user._id,
 	};
 
-	const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
-	// await User.findByIdAndUpdate(user._id, { token });
+	const token = jwt.sign(payload, JWT_SECRET, {expiresIn: "24h"});
+	await User.findByIdAndUpdate(user._id, { token });
 
 	res.json({ token });
+};
+
+const getCurrent = (req, res) => {
+	const { subscription, email } = req.user;
+
+	res.json({
+		email,
+		subscription,
+	});
+};
+
+const logout = async (req, res) => {
+	const { _id } = req.user;
+	await User.findByIdAndUpdate(_id, { token: "" });
+
+	res.status(204);
 };
 
 export default {
     signup: ctrlWrapper(signup),
     signin: ctrlWrapper(signin),
+    getCurrent: ctrlWrapper(getCurrent),
+    logout: ctrlWrapper(logout),
 }
