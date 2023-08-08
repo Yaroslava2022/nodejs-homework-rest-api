@@ -2,7 +2,7 @@ import express from "express";
 import {validateBody} from "../../decorators/index.js";
 import contactsSchemas from "../../schemas/contacts-schemas.js";
 import contactsController from "../../controllers/contacts-controller.js"
-import {isEmptyBody, isValidId, authenticate} from "../../middlewares/index.js";
+import { isEmptyBody, isValidId, authenticate} from "../../middlewares/index.js";
 
 
 const contactsRouter = express.Router()
