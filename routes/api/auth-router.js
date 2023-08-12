@@ -7,7 +7,9 @@ import {authenticate, upload} from "../../middlewares/index.js";
 const authRouter = express.Router();
 
 authRouter.post("/users/register", validateBody(usersSchemas.userSignupSchema), authController.signup);
-
+authRouter.get("/users/verify/:verificationToken", authController.verifyEmail);
+authRouter.post("/users/verify", validateBody(usersSchemas.userEmailSchema), authController.resendVerifyEmail,
+);
 authRouter.post("/users/login", validateBody(usersSchemas.userSigninSchema), authController.signin);
 authRouter.patch("/users/avatars", authenticate, upload.single("avatar"), authController.updateAvatar
 );
